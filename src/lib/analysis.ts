@@ -266,11 +266,12 @@ export async function analyzeMarket(
         });
         if (!response.ok) {
           const body = await response.json().catch(() => ({}));
+          const upstreamMessage =
+            typeof body.error === "string" ? body.error : "";
           const error = new Error(
-            body.error ||
-              (response.status >= 500
-                ? "调研服务刚刚启动，暂时没有响应"
-                : `调研服务返回 ${response.status}`),
+            response.status >= 500
+              ? "调研服务暂时繁忙，请稍后重试"
+              : upstreamMessage || `调研服务返回 ${response.status}`,
           ) as Error & { retryable?: boolean };
           error.retryable = [500, 502, 503, 504].includes(response.status);
           throw error;
