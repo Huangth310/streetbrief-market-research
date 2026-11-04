@@ -1,3 +1,13 @@
+---
+domain: nlp
+tags:
+  - market-research
+  - retail
+datasets:
+models:
+license: Apache License 2.0
+---
+
 # 街研
 
 面向小额餐饮创业者的周边市场调研 MVP。输入一个经营位置和可选的目标品类，查看直接竞品、公开证据、客群场景、机会类型与经营建议。
