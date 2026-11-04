@@ -352,9 +352,13 @@ function calculateRanking(grouped, anchorCount) {
       opportunity,
       labelText,
       note:
-        items.length > 0
-          ? `调查范围内找到 ${items.length} 家同类门店。`
-          : "调查范围内暂未找到同类门店。",
+        items.length === 0
+          ? "暂未找到同类门店，缺少可用于比较的竞争参照。"
+          : items.length > 12
+            ? `附近有 ${items.length} 家同类门店，竞争较密集，需要先找到清楚的差异。`
+            : items.length >= 3
+              ? `附近有 ${items.length} 家同类门店，资料覆盖度 ${Math.round(averageCompleteness)}%，具备初步比较条件。`
+              : `附近仅找到 ${items.length} 家同类门店，样本偏少，建议先补充现场观察。`,
     };
   });
 }
@@ -1134,12 +1138,17 @@ export async function buildLiveReport({ address, mode, category }) {
   const grouped = Object.fromEntries(
     categories.map((key) => [key, broadPois.filter((poi) => matchesCategory(poi, key))]),
   );
-  const ranking = calculateRanking(grouped, anchors.length);
+  const ranking = calculateRanking(grouped, anchors.length).sort(
+    (a, b) =>
+      b.score - a.score ||
+      b.potentialScore - a.potentialScore ||
+      a.label.localeCompare(b.label, "zh-CN"),
+  );
   let selectedCategory =
     mode === "targeted" && CATEGORY_CONFIG[category] ? category : null;
 
   if (!selectedCategory) {
-    selectedCategory = [...ranking].sort((a, b) => b.score - a.score)[0].category;
+    selectedCategory = ranking[0].category;
   }
 
   let candidates = grouped[selectedCategory];

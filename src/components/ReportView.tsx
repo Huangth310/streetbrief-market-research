@@ -92,6 +92,9 @@ export function ReportView({
     initialReport.input.mode === "discover",
   );
   const isDiscoveryMode = report.input.mode === "discover";
+  const recommendationRank =
+    report.ranking.findIndex((item) => item.category === report.category) + 1;
+  const recommendationItem = report.ranking[recommendationRank - 1];
   const activeRadius =
     distanceFilter === "core"
       ? 800
@@ -219,7 +222,9 @@ export function ReportView({
             <div className="report-breadcrumb">
               <span>{isDiscoveryMode ? "经营方向推荐" : "周边市场调研"}</span>
               <ChevronRight size={13} />
-              <span>{report.profile.label}</span>
+              <span>
+                {isDiscoveryMode ? "五类方向比较" : report.profile.label}
+              </span>
               <span className="sample-pill">
                 <Database size={12} />
                 {report.sample
@@ -235,7 +240,7 @@ export function ReportView({
             <h1>
               {isDiscoveryMode ? (
                 <>
-                  建议先试
+                  优先验证
                   <br />
                   <span className="recommendation-highlight">
                     {report.profile.label}
@@ -256,7 +261,7 @@ export function ReportView({
             )}
             <p className="report-summary">
               {isDiscoveryMode
-                ? `综合附近门店数量、公开价格和周边人群后，这个方向更适合先做一轮小范围验证。${report.profile.opportunityTitle}。`
+                ? `在五类经营方向中排第 ${recommendationRank || 1}。${recommendationItem?.note || "公开资料相对更完整。"}接下来建议：${report.profile.opportunityTitle}。这是首轮验证顺序，不代表销量或盈利预测。`
                 : report.profile.summary}
             </p>
             <div className="report-cover-meta">
@@ -275,7 +280,9 @@ export function ReportView({
             </div>
           </div>
           <div className="report-verdict">
-            <span className="verdict-type">开店潜力</span>
+            <span className="verdict-type">
+              {isDiscoveryMode ? "方向优先度" : "开店潜力"}
+            </span>
             <div
               className="potential-meter"
               aria-label={`开店潜力 ${potentialScore} 分，满分 5 分`}
@@ -306,15 +313,16 @@ export function ReportView({
           </div>
         </section>
 
-        <MarketSnapshot report={report} />
-
         {startedOpen && (
           <section className="report-section ranking-section">
             <div className="section-heading-row">
               <div>
-                <span className="section-index">候选品类</span>
-                <h2>附近有哪些经营方向</h2>
+                <span className="section-index">方向排序</span>
+                <h2>五个方向，谁更值得先试</h2>
               </div>
+              <p className="heading-note">
+                排序依据是公开门店数量、资料完整度与周边人群，不代表销量预测。
+              </p>
             </div>
             <div className="ranking-list">
               {report.ranking.map((item, index) => (
@@ -333,10 +341,15 @@ export function ReportView({
                     <div>
                       <strong>{item.label}</strong>
                       <span className="potential-mini">
-                        潜力 {item.potentialScore}/5
+                        优先度 {item.potentialScore}/5
                       </span>
                     </div>
                     <p>{item.note}</p>
+                    {item.category === report.category && (
+                      <span className="ranking-recommendation">
+                        当前建议先验证
+                      </span>
+                    )}
                   </div>
                   <ChevronRight size={17} />
                 </button>
@@ -344,6 +357,8 @@ export function ReportView({
             </div>
           </section>
         )}
+
+        <MarketSnapshot report={report} />
 
         <section className="report-section area-overview-section">
           <div className="section-heading-row">
