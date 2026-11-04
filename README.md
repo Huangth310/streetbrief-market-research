@@ -19,6 +19,26 @@ pnpm dev
 分析。实时接口失败或超过 75 秒时，页面会显示失败原因并提供“查看演示报告”
 入口，不会在用户不知情时把演示样本冒充成实时结果。
 
+## 在线部署
+
+仓库已提供 `render.yaml`，推荐在 Render 上使用一个 Node Web Service 同时托管
+前端和 `/api`。生产构建会读取 `.env.production`，强制关闭演示模式，并以同源
+方式调用后端，因此不需要配置跨域或前端 API 地址。
+
+1. 在高德开放平台创建“Web 服务”类型的 Key。本项目不调用高德 JS API。
+2. 点击下方按钮，授权 Render 读取本仓库并创建服务。
+3. 在 Render 的 Environment 中填写 `AMAP_WEB_SERVICE_KEY`。模型与搜索服务可选；
+   未配置模型时会使用确定性规则分析，未配置 Tavily 时仍会使用高德 POI 数据。
+4. 部署完成后访问 `/api/health`，确认 `services.amap` 和 `ready` 均为 `true`。
+5. 用非珠海地址发起一次调研，确认报告标记为“实时分析”而非“演示缓存”。
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Huangth310/streetbrief-market-research)
+
+高德密钥、模型密钥和搜索密钥只能填在服务端环境变量中，不能写入任何
+`VITE_` 变量。免费实例长时间无访问后会休眠，黑客松正式展示前建议提前访问
+一次，或升级为常驻实例。项目也包含 `Dockerfile`，可部署到 Railway、Zeabur
+或其他支持容器或 Node.js 的平台。
+
 ## 当前能力
 
 - 指定品类与开放品类两个入口；
