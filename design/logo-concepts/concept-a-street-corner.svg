@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">街角坐标</title>
+  <rect x="16" y="16" width="224" height="224" rx="68" fill="#17272c"/>
+  <path d="M60 76H108L144 112H198" fill="none" stroke="#fbfaf5" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M60 180V132" fill="none" stroke="#fbfaf5" stroke-width="28" stroke-linecap="round"/>
+  <circle cx="144" cy="112" r="20" fill="#eb6548" stroke="#17272c" stroke-width="8"/>
+  <circle cx="144" cy="112" r="6" fill="#17272c"/>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">街研扫描标小尺寸版</title>
+  <path d="M203 73A91 91 0 1 0 217 145" fill="none" stroke="#152a30" stroke-width="30" stroke-linecap="round"/>
+  <circle cx="128" cy="128" r="27" fill="#152a30"/>
+  <path d="m155 155 47 47" fill="none" stroke="#df6246" stroke-width="23" stroke-linecap="round"/>
+  <circle cx="205" cy="205" r="14" fill="#df6246"/>
+</svg>

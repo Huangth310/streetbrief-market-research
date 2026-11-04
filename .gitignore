@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.tsbuild/
+~$*.docx
+.docx_render*/
+.DS_Store
+.qa*
+qa-*.png
