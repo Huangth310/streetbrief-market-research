@@ -254,22 +254,33 @@ export async function analyzeMarket(
         ? configuredBase
         : "";
 
-    const response = await fetch(`${apiBase}/api/analyze`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
-      signal: AbortSignal.timeout(75_000),
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => ({}));
-      throw new Error(
-        body.error ||
-          (response.status === 500
-            ? "实时分析服务没有正常启动"
-            : `分析服务返回 ${response.status}`),
-      );
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 75_000);
+    try {
+      const response = await fetch(`${apiBase}/api/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(
+          body.error ||
+            (response.status === 500
+              ? "实时分析服务没有正常启动"
+              : `分析服务返回 ${response.status}`),
+        );
+      }
+      return (await response.json()) as Report;
+    } catch (error) {
+      if (controller.signal.aborted) {
+        throw new Error("实时分析超过 75 秒，请换一个更具体的地址后重试");
+      }
+      throw error;
+    } finally {
+      window.clearTimeout(timeoutId);
     }
-    return (await response.json()) as Report;
   }
 
   await new Promise((resolve) => setTimeout(resolve, 460));

@@ -156,8 +156,22 @@ app.post("/api/analyze", analysisLimiter, async (request, response) => {
 
 const distDir = path.join(config.rootDir, "dist");
 if (fs.existsSync(distDir)) {
-  app.use(express.static(distDir, { maxAge: "1h" }));
+  app.use(
+    express.static(distDir, {
+      setHeaders(response, filePath) {
+        if (path.basename(filePath) === "index.html") {
+          response.setHeader("Cache-Control", "no-store");
+        } else if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+          response.setHeader(
+            "Cache-Control",
+            "public, max-age=31536000, immutable",
+          );
+        }
+      },
+    }),
+  );
   app.get("*", (_request, response) => {
+    response.setHeader("Cache-Control", "no-store");
     response.sendFile(path.join(distDir, "index.html"));
   });
 }
