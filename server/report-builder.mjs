@@ -1171,7 +1171,7 @@ export async function buildLiveReport({ address, mode, category }) {
       sourceType: "map-api",
       capturedAt: nowLabel(),
       grade: "A",
-      excerpt: `地址“${address}”解析为“${center.label}”，坐标为 ${center.lng},${center.lat}。`,
+      excerpt: `地址“${address}”解析为“${center.label}”，坐标为 ${center.lng},${center.lat}。${center.precisionNote || ""}`,
       field: "地址与坐标",
       synthetic: false,
     },

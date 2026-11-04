@@ -78,7 +78,13 @@ export function pickAddressPoi(address, pois) {
     .map((poi) => {
       const name = normalizePlaceName(poi.name);
       const fullAddress = normalizePlaceName(`${poi.name} ${poi.address}`);
+      const hasLandmarkTerm = terms.some(
+        (term) => name.includes(term) || fullAddress.includes(term),
+      );
       let score = 0;
+      if (!hasLandmarkTerm) {
+        return { poi, score: -1 };
+      }
       if (name.includes(target) || target.includes(name)) score += 100;
       for (const term of terms) {
         if (name.includes(term)) score += 30;
@@ -90,6 +96,34 @@ export function pickAddressPoi(address, pois) {
     .sort((a, b) => b.score - a.score);
 
   return scored[0]?.poi || null;
+}
+
+async function estimateLandmarkCenter(address, center) {
+  const terms = landmarkTerms(address);
+  if (terms.length === 0) return null;
+  const landmark = terms[terms.length - 1];
+  const pois = await requestAround(center, { keywords: address, page: 1 });
+  const matches = pois
+    .filter((poi) => {
+      const text = normalizePlaceName(`${poi.name} ${poi.address}`);
+      return text.includes(landmark);
+    })
+    .map((poi) => {
+      const [lng, lat] = String(poi.location || "")
+        .split(",")
+        .map(Number);
+      return { lat, lng };
+    })
+    .filter((point) => Number.isFinite(point.lat) && Number.isFinite(point.lng));
+
+  if (matches.length < 2) return null;
+
+  return {
+    lat: matches.reduce((total, point) => total + point.lat, 0) / matches.length,
+    lng: matches.reduce((total, point) => total + point.lng, 0) / matches.length,
+    landmark,
+    sampleCount: matches.length,
+  };
 }
 
 export async function geocodeAddress(address) {
@@ -150,6 +184,25 @@ export async function geocodeAddress(address) {
 
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
     throw new Error("地址解析结果缺少有效坐标");
+  }
+
+  if (terms.length > 0) {
+    try {
+      const estimated = await estimateLandmarkCenter(address, { lat, lng });
+      if (estimated) {
+        return {
+          lat: estimated.lat,
+          lng: estimated.lng,
+          label: address,
+          precisionNote: `高德未单独收录“${estimated.landmark}”POI；观察点依据周边 ${estimated.sampleCount} 条含该地标的公开地址估算。`,
+          province: first.province || "",
+          city: first.city || first.province || "",
+          district: first.district || "",
+        };
+      }
+    } catch {
+      // Fall back to the geocoded address when the landmark proxy query fails.
+    }
   }
 
   return {

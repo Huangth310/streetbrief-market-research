@@ -20,4 +20,13 @@ describe("pickAddressPoi", () => {
       ]),
     ).toBeNull();
   });
+
+  it("does not mistake a campus center for a specific gate", () => {
+    expect(
+      pickAddressPoi("中山大学珠海校区北门", [
+        { name: "中山大学珠海校区", address: "大学路2号" },
+        { name: "中山大学珠海校区国际金融学院", address: "海琴6号" },
+      ]),
+    ).toBeNull();
+  });
 });
