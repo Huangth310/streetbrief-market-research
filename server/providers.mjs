@@ -94,6 +94,7 @@ export function pickAddressPoi(address, pois) {
 
 export async function geocodeAddress(address) {
   ensureMapKey();
+  const terms = landmarkTerms(address);
   const geocodeParams = new URLSearchParams({
     key: config.mapKey,
     address,
