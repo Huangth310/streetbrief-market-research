@@ -15,7 +15,7 @@ export const DEMO_CENTER = {
 export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
   coffee: {
     category: "coffee",
-    label: "咖啡与奶咖",
+    label: "现萃咖啡",
     shortLabel: "咖啡",
     score: 73,
     potentialScore: 4,
@@ -24,14 +24,14 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
     summary:
       "演示资料里，最近的咖啡店约 120 米，3 家位于 800 米内。公开价格覆盖 12 至 22 元，最早 07:30 开门，一家营业到 22:30。",
     categoryBoundary:
-      "茶饮与果茶会和咖啡争夺下午提神场景。系统按门店主分类判定直接竞品，混合店只计入主要经营类型。",
+      "茶饮和果茶会与咖啡争夺下午提神需求。这里只把以咖啡为主的门店算作同类门店。",
     coverage: 78,
     priceBand: "12–22 元",
     openingHint: "07:30–20:30",
     opportunity: "mature_entry",
     opportunityTitle: "先做稳定快取，再保留少量座位",
     opportunitySummary:
-      "近端已有 3 家直接竞品。演示资料显示，早晨产品以外带和基础奶咖为主，下午仍有门店营业。新店可以先把出杯速度做稳，再用少量座位承接短暂停留。",
+      "近端已有 3 家同类门店。演示资料显示，早晨产品以外带和基础奶咖为主，下午仍有门店营业。新店可以先把出杯速度做稳，再用少量座位承接短暂停留。",
     opportunityCaution:
       "演示资料没有真实客流和订单数据，座位数量与营业时长要用试营业记录调整。",
     recommendation: {
@@ -49,7 +49,7 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
   },
   light: {
     category: "light",
-    label: "轻食与工作日简餐",
+    label: "轻食快餐",
     shortLabel: "轻食",
     score: 69,
     potentialScore: 4,
@@ -58,7 +58,7 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
     summary:
       "演示样本记录了 8 家轻食店，公开组合价格集中在 24 至 36 元。2 家缺少菜单与价格，午间产品和出餐时间仍有较多未确认信息。",
     categoryBoundary:
-      "轻食、简餐和烘焙可能争夺工作日午餐或快速补给，但直接竞品仍按门店主要产品分开统计。",
+      "轻食、简餐和烘焙会共同争夺工作日午餐，但这里只把以轻食或简餐为主的门店算作同类门店。",
     coverage: 61,
     priceBand: "24–36 元",
     openingHint: "10:30–19:30",
@@ -83,7 +83,7 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
   },
   tea: {
     category: "tea",
-    label: "茶饮、奶茶与果茶",
+    label: "鲜果茶饮",
     shortLabel: "茶饮",
     score: 58,
     potentialScore: 3,
@@ -92,7 +92,7 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
     summary:
       "演示样本中的茶饮店集中在果茶、基础奶茶和低价外带。公开价格覆盖 10 至 18 元，产品重合度高，门店需要说明自己更适合哪个具体时段。",
     categoryBoundary:
-      "茶饮、果茶与咖啡在提神和外带场景上存在替代关系。系统按门店主分类判定直接竞品，混合店只计入主要经营类型。",
+      "果茶和咖啡都能满足提神、外带需求。这里只把以茶饮和果茶为主的门店算作同类门店。",
     coverage: 72,
     priceBand: "10–18 元",
     openingHint: "10:00–21:30",
@@ -117,8 +117,8 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
   },
   bakery: {
     category: "bakery",
-    label: "烘焙、面包与甜点",
-    shortLabel: "烘焙",
+    label: "烘焙包点",
+    shortLabel: "烘焙包点",
     score: 64,
     potentialScore: 3,
     decisionLabel: "建议先做小范围测试",
@@ -126,7 +126,7 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
     summary:
       "演示样本记录了 8 家烘焙店，单件价格约 8 至 22 元。公开页面更多展示下午甜点和组合产品，早晨现烤与快速带走的信息较少。",
     categoryBoundary:
-      "烘焙单品可能和轻食、咖啡搭配消费发生重叠，但这里只把以烘焙为主的门店计入直接竞品。",
+      "面包和甜点常与轻食、咖啡一起消费，但这里只把以烘焙为主的门店算作同类门店。",
     coverage: 66,
     priceBand: "8–22 元",
     openingHint: "07:30–19:30",
@@ -151,8 +151,8 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
   },
   snack: {
     category: "snack",
-    label: "小吃与轻夜宵",
-    shortLabel: "夜宵",
+    label: "夜宵小吃",
+    shortLabel: "夜宵小吃",
     score: 49,
     potentialScore: 1,
     decisionLabel: "暂不建议开店",
@@ -188,7 +188,7 @@ export const categoryProfiles: Record<CategoryKey, CategoryProfile> = {
 export const categoryRanking: CategoryRank[] = [
   {
     category: "coffee",
-    label: "咖啡与奶咖",
+    label: "现萃咖啡",
     score: 73,
     potentialScore: 4,
     breakdown: {
@@ -206,7 +206,7 @@ export const categoryRanking: CategoryRank[] = [
   },
   {
     category: "light",
-    label: "轻食与工作日简餐",
+    label: "轻食快餐",
     score: 69,
     potentialScore: 4,
     breakdown: {
@@ -224,7 +224,7 @@ export const categoryRanking: CategoryRank[] = [
   },
   {
     category: "bakery",
-    label: "烘焙、面包与甜点",
+    label: "烘焙包点",
     score: 64,
     potentialScore: 3,
     breakdown: {
@@ -242,7 +242,7 @@ export const categoryRanking: CategoryRank[] = [
   },
   {
     category: "tea",
-    label: "茶饮、奶茶与果茶",
+    label: "鲜果茶饮",
     score: 58,
     potentialScore: 3,
     breakdown: {
@@ -260,7 +260,7 @@ export const categoryRanking: CategoryRank[] = [
   },
   {
     category: "snack",
-    label: "小吃与轻夜宵",
+    label: "夜宵小吃",
     score: 49,
     potentialScore: 1,
     breakdown: {
@@ -493,7 +493,7 @@ export function buildDemoEvidence(category: CategoryKey): Evidence[] {
       index === 2 || index === 6
         ? "演示样本仅保留了位置、距离和部分基础字段，未提供可信菜单与价格。"
         : `演示样本记录：${names[index]}，距观察点约 ${pointTemplates[index].distanceM} 米，公开营业信息为 ${hours[index] ?? "未获取"}，价格带为 ${prices[category][index] ?? "未获取"}。`,
-    field: index === 2 || index === 6 ? "基础 POI" : "门店公开字段",
+    field: index === 2 || index === 6 ? "地点基础信息" : "门店公开信息",
     synthetic: true,
   }));
 
@@ -506,7 +506,7 @@ export function buildDemoEvidence(category: CategoryKey): Evidence[] {
       capturedAt: "2026-11-03 09:20",
       grade: "B",
       excerpt:
-        "演示样本中，5 家具备可比价格信息的直接竞品集中在低价快取到中价停留之间；仍有 2 家缺少公开菜单，不能进入价格对比。",
+        "演示样本中，5 家具备可比价格信息的同类门店集中在低价快取到中价停留之间；仍有 2 家缺少公开菜单，不能进入价格对比。",
       field: "产品与价格",
       synthetic: true,
     },

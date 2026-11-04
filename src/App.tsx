@@ -30,11 +30,11 @@ export default function App() {
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (analysisError) {
       setError(
-        `没有取得实时数据：${
+        `这次没有拿到实时结果：${
           analysisError instanceof Error
             ? analysisError.message
             : "请检查地址或服务连接"
-        }。你可以稍后重试，或先查看演示报告。`,
+        }。请稍后重新点一次“开始调研”。`,
       );
       setView("landing");
     }

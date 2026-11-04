@@ -28,20 +28,52 @@ export function MarketSnapshot({ report }: { report: Report }) {
       <div className="snapshot-head">
         <div>
           <span className="section-index">街区快照</span>
-          <h2 id="snapshot-title">从附近地点到开店判断</h2>
+          <h2 id="snapshot-title">从周边门店到开店判断</h2>
         </div>
         <p>
           {report.profile.categoryBoundary ||
-            "直接竞品按门店主要产品分别统计，相近品类只用于理解消费场景。"}
+            "只统计与你准备经营的方向直接重合的门店，相近方向只用来理解消费场景。"}
         </p>
       </div>
 
       <div className="snapshot-flow">
-        <div className="snapshot-map" aria-label="附近竞品位置示意">
+        <div className="snapshot-map" aria-label="周边同类门店位置示意">
+          <svg
+            className="snapshot-map-art"
+            viewBox="0 0 800 390"
+            preserveAspectRatio="none"
+            aria-hidden="true"
+          >
+            <path
+              className="snapshot-road snapshot-road-main"
+              d="M-30 305 C170 238 268 261 430 188 S690 105 830 128"
+            />
+            <path
+              className="snapshot-road snapshot-road-side"
+              d="M230 -30 C251 87 301 141 336 219 S376 329 361 420"
+            />
+            <path
+              className="snapshot-road snapshot-road-side"
+              d="M613 -20 C590 89 552 153 520 238 S470 335 480 418"
+            />
+            <path
+              className="snapshot-walkway"
+              d="M84 75 C225 104 279 114 381 197 S624 316 762 321"
+            />
+            <rect className="snapshot-block" x="56" y="35" width="125" height="67" />
+            <rect className="snapshot-block" x="289" y="55" width="103" height="55" />
+            <rect className="snapshot-block" x="603" y="198" width="120" height="61" />
+            <rect className="snapshot-block" x="96" y="244" width="97" height="63" />
+          </svg>
           <span className="snapshot-ring ring-a" />
           <span className="snapshot-ring ring-b" />
+          <span className="snapshot-map-kicker">
+            调研位置：{report.input.address} · 3 公里范围
+          </span>
           <span className="snapshot-center">
-            <MapPinned size={16} />
+            <span className="snapshot-center-icon">
+              <MapPinned size={19} />
+            </span>
           </span>
           {competitors.map((item, index) => {
             const latOffset = (item.lat - report.center.lat) * 111;
@@ -49,26 +81,66 @@ export function MarketSnapshot({ report }: { report: Report }) {
               (item.lng - report.center.lng) *
               111 *
               Math.cos((report.center.lat * Math.PI) / 180);
+            let x = (lngOffset / maxOffset) * 34;
+            let y = -(latOffset / maxOffset) * 34;
+            const distanceFromCenter = Math.hypot(x, y);
+            const minimumDistance = 18;
+            if (distanceFromCenter < minimumDistance) {
+              const scale =
+                distanceFromCenter > 0
+                  ? minimumDistance / distanceFromCenter
+                  : 1;
+              x = distanceFromCenter > 0 ? x * scale : minimumDistance;
+              y = distanceFromCenter > 0 ? y * scale : 0;
+            }
+            const left = clamp(50 + x, 12, 88);
+            const top = clamp(50 + y, 14, 86);
             return (
               <span
-                className="snapshot-store"
+                className={`snapshot-store ${
+                  index < 4 ? "has-label" : ""
+                } ${index === 0 ? "is-nearest" : ""} ${
+                  left > 58 ? "label-left" : "label-right"
+                }`}
                 style={{
-                  left: `${clamp(50 + (lngOffset / maxOffset) * 34, 12, 88)}%`,
-                  top: `${clamp(50 - (latOffset / maxOffset) * 34, 12, 88)}%`,
+                  left: `${left}%`,
+                  top: `${top}%`,
                 }}
                 key={item.id}
               >
-                <b>{index + 1}</b>
+                <span className="snapshot-store-pin">
+                  <Store size={13} />
+                  <b>{String(index + 1).padStart(2, "0")}</b>
+                </span>
+                {index < 4 && (
+                  <span className="snapshot-store-label">
+                    <b>{item.name}</b>
+                    <small>{item.distanceM} 米</small>
+                  </span>
+                )}
               </span>
             );
           })}
-          <span className="snapshot-caption">竞品与观察点</span>
+          <div className="snapshot-map-legend">
+            <span>
+              <i className="legend-center" />
+              调研位置
+            </span>
+            <span>
+              <i className="legend-store" />
+              同类门店
+            </span>
+            <span>
+              <i className="legend-radius" />
+              参考范围
+            </span>
+          </div>
         </div>
 
         <div className="snapshot-metrics">
           <div>
             <Store size={16} />
-            <span>直接竞品</span>
+            <span>同类门店</span>
             <strong>{report.competitors.length} 家</strong>
             <small>
               {nearest ? `最近 ${nearest.distanceM} 米` : "暂无同类门店"}

@@ -65,7 +65,7 @@ export function SummaryModal({ report, onClose }: SummaryModalProps) {
         <div className="print-sheet">
           <header className="print-sheet-head">
             <div>
-              <span>街研 / FIELD NOTE</span>
+              <span>街研 / 开店调研</span>
               <h2 id="summary-title">{report.profile.headline}</h2>
             </div>
             <div className="summary-verdict">

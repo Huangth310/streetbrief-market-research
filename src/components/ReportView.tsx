@@ -194,10 +194,10 @@ export function ReportView({
       <header className="report-header no-print">
         <Brand compact onHome={onRestart} />
         <div className="report-header-center">
-          <span>FIELD NOTE</span>
+          <span>本次调研</span>
           <strong>
-            {report.profile.shortLabel} ·{" "}
-            {report.sample ? "珠海演示点" : report.center.label}
+            {report.input.category ? report.profile.label : "未指定品类"} ·{" "}
+            {report.input.address}
           </strong>
         </div>
         <div className="report-actions">
@@ -225,7 +225,7 @@ export function ReportView({
                   ? "演示缓存"
                   : report.cacheHit
                     ? "实时结果 · 缓存命中"
-                    : "公开数据实时分析"}
+                    : "本次实时调研"}
               </span>
               <span className="report-data-date">
                 {report.generatedAt} 更新
@@ -245,7 +245,7 @@ export function ReportView({
             <div className="report-cover-meta">
               <span>
                 <b>{report.competitors.length}</b>
-                直接竞品
+                同类门店
               </span>
               <span>
                 <b>{report.profile.priceBand}</b>
@@ -379,8 +379,8 @@ export function ReportView({
             </article>
 
             <article className="area-overview-card">
-              <span className="overview-label">竞品概况</span>
-              <h3>{report.competitors.length} 家直接竞品</h3>
+              <span className="overview-label">门店概况</span>
+              <h3>{report.competitors.length} 家同类门店</h3>
               <p>
                 {report.competitors
                   .slice(0, 3)
@@ -430,7 +430,7 @@ export function ReportView({
         <section className="report-section map-section">
           <div className="section-heading-row">
             <div>
-              <span className="section-index">周边竞品</span>
+              <span className="section-index">周边门店</span>
               <h2>周边同类门店</h2>
             </div>
             <span className="heading-note">
@@ -540,7 +540,7 @@ export function ReportView({
           {selectedCompetitor && (
             <div className="competitor-detail-strip">
               <div>
-                <span className="section-index">竞品详情</span>
+                <span className="section-index">门店详情</span>
                 <h3>{selectedCompetitor.name}</h3>
                 <p>
                   {selectedCompetitor.concept}

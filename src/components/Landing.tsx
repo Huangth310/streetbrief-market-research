@@ -36,6 +36,13 @@ const previewMarkers = [
 ];
 
 const ADDRESS_HISTORY_KEY = "streetbrief-address-history";
+const categoryOrder: CategoryKey[] = [
+  "coffee",
+  "tea",
+  "light",
+  "bakery",
+  "snack",
+];
 
 function readAddressHistory() {
   try {
@@ -136,14 +143,14 @@ export function Landing({
           <span className="status-dot" aria-hidden="true" />
           <span>{isDemoMode ? "演示数据已就绪" : "公开数据服务已就绪"}</span>
           <span className="header-divider" />
-          <span>珠海 · 3 KM</span>
+          <span>3 公里调研范围</span>
         </div>
       </header>
 
       <section className="hero">
         <div className="hero-copy">
           <div className="eyebrow">
-            <span>FIELD NOTE 01</span>
+            <span>开店观察</span>
             <span>周边餐饮市场调研</span>
           </div>
           <h1>
@@ -233,6 +240,43 @@ export function Landing({
         <div className="brief-panel-intro">
           <h2 className="location-question-title">您想调研哪个位置？</h2>
           <p>填写位置和你准备经营的品类，就可以开始。</p>
+          <div className="location-intro-art" aria-hidden="true">
+            <div className="location-art-card">
+              <span className="location-art-label">街区观察</span>
+              <strong>3 km</strong>
+              <span className="location-art-caption">从位置出发，把附近看清楚</span>
+            </div>
+            <svg viewBox="0 0 360 230">
+              <path
+                className="location-art-road"
+                d="M-20 174 C66 121 114 145 168 108 S283 28 391 64"
+              />
+              <path
+                className="location-art-path"
+                d="M58 208 C84 154 105 127 139 111 S202 88 226 42"
+              />
+              <circle className="location-art-ring" cx="184" cy="118" r="78" />
+              <circle className="location-art-ring is-small" cx="184" cy="118" r="42" />
+              <circle className="location-art-center" cx="184" cy="118" r="18" />
+              <g className="location-art-pin pin-one" transform="translate(236 63)">
+                <path d="M0 23C0 13 18 13 18 23C18 33 9 40 9 40C9 40 0 33 0 23Z" />
+                <circle cx="9" cy="23" r="3.5" />
+              </g>
+              <g className="location-art-pin pin-two" transform="translate(103 148)">
+                <path d="M0 23C0 13 18 13 18 23C18 33 9 40 9 40C9 40 0 33 0 23Z" />
+                <circle cx="9" cy="23" r="3.5" />
+              </g>
+              <g className="location-art-pin pin-three" transform="translate(256 157)">
+                <path d="M0 23C0 13 18 13 18 23C18 33 9 40 9 40C9 40 0 33 0 23Z" />
+                <circle cx="9" cy="23" r="3.5" />
+              </g>
+            </svg>
+            <div className="location-art-tags">
+              <span>同类门店</span>
+              <span>周边客群</span>
+              <span>价格与时段</span>
+            </div>
+          </div>
         </div>
 
         <form className="analysis-form" onSubmit={submit}>
@@ -324,11 +368,14 @@ export function Landing({
                       setCategory(event.target.value as CategoryKey)
                     }
                   >
-                    {Object.values(categoryProfiles).map((profile) => (
-                      <option value={profile.category} key={profile.category}>
-                        {profile.label}
-                      </option>
-                    ))}
+                    {categoryOrder.map((key) => {
+                      const profile = categoryProfiles[key];
+                      return (
+                        <option value={profile.category} key={profile.category}>
+                          {profile.label}
+                        </option>
+                      );
+                    })}
                   </select>
                   <ChevronDown size={17} aria-hidden="true" />
                 </div>
@@ -387,7 +434,7 @@ export function Landing({
       </section>
 
       <footer className="landing-footer">
-        <span>SHIJIEYAN / FIELD RESEARCH</span>
+        <span>街研 / 周边市场调研</span>
         <span>每次分析都会标明实时、缓存或演示状态</span>
       </footer>
     </main>

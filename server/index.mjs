@@ -15,6 +15,7 @@ app.disable("x-powered-by");
 app.set("trust proxy", 1);
 
 app.use((_request, response, next) => {
+  response.setHeader("Cache-Control", "no-store");
   response.setHeader("X-Content-Type-Options", "nosniff");
   response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   response.setHeader(

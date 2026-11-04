@@ -100,7 +100,7 @@ function mapEvidenceFor(poi, id) {
 
   return {
     id,
-    title: `${poi.name} · 高德 POI 基础字段`,
+    title: `${poi.name} · 高德地点信息`,
     source: "高德地图 Web 服务 API",
     sourceType: "map-api",
     capturedAt: nowLabel(),
@@ -158,7 +158,7 @@ function tacticList(poi, evidenceCount) {
   if (poi.hours) output.push(`公开营业至 ${poi.hours}`);
   if (poi.cost) output.push(`公开人均约 ${poi.cost} 元`);
   if (evidenceCount > 0) output.push(`已关联 ${evidenceCount} 条公开网页线索`);
-  if (output.length === 0) output.push("仅获取基础 POI");
+  if (output.length === 0) output.push("仅获取地点基础信息");
   return output.slice(0, 3);
 }
 
@@ -345,7 +345,7 @@ function calculateRanking(grouped, anchorCount) {
             : "low",
       missingData:
         items.length < 3
-          ? ["直接竞品样本不足", "公开菜单与价格", "公开评价主题"]
+          ? ["同类门店样本不足", "公开菜单与价格", "公开评价主题"]
           : averageCompleteness < 65
             ? ["部分门店菜单与价格", "评价主题覆盖"]
             : ["菜单价格逐店核验", "评价主题覆盖"],
@@ -353,8 +353,8 @@ function calculateRanking(grouped, anchorCount) {
       labelText,
       note:
         items.length > 0
-          ? `调查范围内找到 ${items.length} 家直接竞品。`
-          : "调查范围内暂未找到直接竞品。",
+          ? `调查范围内找到 ${items.length} 家同类门店。`
+          : "调查范围内暂未找到同类门店。",
     };
   });
 }
@@ -409,7 +409,7 @@ function anchorEvidence(anchors, evidence) {
     const id = makeEvidenceId("A", index++);
     evidence.push({
       id,
-      title: `周边${type} POI`,
+      title: `周边${type}地点`,
       source: "高德地图 Web 服务 API",
       sourceType: "map-api",
       capturedAt: nowLabel(),
@@ -545,12 +545,12 @@ function fallbackAnalysis({
   return {
     headline,
     summary: competitors.length
-      ? `附近找到 ${competitors.length} 家直接竞品，最近一家约 ${nearestDistance} 米。${
+      ? `附近找到 ${competitors.length} 家同类门店，最近一家约 ${nearestDistance} 米。${
           priceKnown.length
             ? `${priceKnown.length} 家能比较价格，公开价格覆盖 ${priceRange}。`
             : "目前没有可核对的公开价格。"
         }${knownHours ? `${knownHours} 家公开了营业时间。` : ""}`
-      : `3 公里内没有找到直接${cat.shortLabel}竞品。`,
+      : `3 公里内没有找到同类${cat.shortLabel}门店。`,
     analysisSummary: competitors.length
       ? `近端已经出现 ${competitors.length} 家同类门店，公开价格${
           priceRange ? `覆盖 ${priceRange}` : "尚未取得"
@@ -572,7 +572,7 @@ function fallbackAnalysis({
       {
         id: "F1",
         layer: "fact",
-        title: `${competitors.length} 家直接竞品，${coreCount} 家在 800 米内`,
+        title: `${competitors.length} 家同类门店，${coreCount} 家在 800 米内`,
         detail: competitors.length
           ? `距离最近的门店是 ${nearestNames}。`
           : "当前没有可纳入地图的同类门店。",
@@ -613,7 +613,7 @@ function fallbackAnalysis({
           ? anchorSegments
               .map((item) => item.description.replace(/。$/, ""))
               .join("；") + "。"
-          : "当前地图结果没有呈现学校、办公或居住地点的集中分布。",
+          : "公开地点资料里没有呈现学校、办公或居住地点的集中分布。",
         implication:
           anchorSegments[0]
             ? `首轮可以先服务${anchorSegments[0].title}，用${anchorSegments[0].description.match(/可能对应(.+?)。/)?.[1] || "日常到店场景"}测试产品结构。`
@@ -629,7 +629,7 @@ function fallbackAnalysis({
             id: "S1",
             level: "potential",
             title: "附近到店人群",
-            description: `已找到 ${competitors.length} 家直接竞品，最近一家约 ${nearestDistance} 米。具体由哪类人群消费，需要到店时段观察。`,
+            description: `已找到 ${competitors.length} 家同类门店，最近一家约 ${nearestDistance} 米。具体由哪类人群消费，需要到店时段观察。`,
             evidenceIds: safeEvidenceIds.slice(0, 2),
           },
         ],
@@ -646,15 +646,15 @@ function fallbackAnalysis({
         summary:
           opportunity === "insufficient"
             ? "附近可识别的直接门店较少，现有价格和营业资料还不足以支撑明确的市场判断。"
-            : `附近已有 ${competitors.length} 家直接竞品，${coreCount} 家在 800 米内。${
+            : `附近已有 ${competitors.length} 家同类门店，${coreCount} 家在 800 米内。${
                 priceKnown.length
                   ? `公开价格覆盖 ${priceRange}，可以从价格空档、出餐速度或营业时段中选一个方向。`
                   : "价格资料较少，可以先比较产品组合和营业时段。"
               }`,
         rationale:
           anchorSegments.length
-            ? `${anchorSegments[0].title}的最近需求地点与直接竞品距离接近，适合作为首轮试验场景。`
-            : `附近直接竞品最近 ${nearestDistance} 米。`,
+            ? `${anchorSegments[0].title}的最近需求地点与同类门店距离接近，适合作为首轮试验场景。`
+            : `附近同类门店最近 ${nearestDistance} 米。`,
         caution:
           "这个方向来自公开门店资料，实际销量和到店人数要用试营业记录判断。",
         confidence: coverage >= 60 ? "medium" : "low",
@@ -673,7 +673,7 @@ function fallbackAnalysis({
           : "先做覆盖近端日常需求的小店模型",
         detail: anchorGroups[0]
           ? `首批产品、门口说明和营业时段都围绕${anchorGroups[0].segment.use}展开，减少同时服务多类客群。`
-          : `附近已有 ${competitors.length} 家直接竞品，最近一家 ${nearestDistance} 米。首店先覆盖最基本的到店需求，再按真实订单扩充场景。`,
+          : `附近已有 ${competitors.length} 家同类门店，最近一家 ${nearestDistance} 米。首店先覆盖最基本的到店需求，再按真实订单扩充场景。`,
         verification: "试营业前三个工作日，记录上午、午间和晚间三个时段的进店人数与购买内容。",
         evidenceIds: safeEvidenceIds,
       },
@@ -710,7 +710,7 @@ function fallbackAnalysis({
           ? `营业时间先对照 ${commonHours}`
           : "先做一个明确的主营业时段",
         detail: commonHours
-          ? `${knownHours} 家竞品公开了营业时间，最常见的是 ${commonHours}。先覆盖这个时段，再根据真实订单决定是否提前或延后。`
+          ? `${knownHours} 家同类门店公开了营业时间，最常见的是 ${commonHours}。先覆盖这个时段，再根据真实订单决定是否提前或延后。`
           : "公开营业时间有限。先选择一段最容易服务周边日常需求的时段，记录订单后再扩展。",
         verification: "每 30 分钟记录订单数、出杯等待和人员压力，再决定是否延长营业。",
         evidenceIds: safeEvidenceIds.slice(0, 3),
@@ -726,7 +726,7 @@ function fallbackAnalysis({
       },
     ],
     limitations: [
-      "公开 POI 与网页摘要无法证明真实客流、销售额、销量或利润。",
+      "公开地点资料与网页摘要无法证明真实客流、销售额、销量或利润。",
       "缺少菜单或价格证据的门店不会进入价格带推断。",
       "Tavily 返回的是公开网页摘要，最终事实仍需打开来源核对。",
       `当前报告生成于 ${nowLabel()}，数据新鲜度以证据卡片中的采集时间为准。`,
@@ -1094,7 +1094,7 @@ function buildLlmPrompt({
   return `位置：${address}
 用户目标品类：${CATEGORY_CONFIG[category].label}
 
-直接竞品：
+同类门店：
 ${JSON.stringify(competitorData)}
 
 周边需求设施：
@@ -1110,6 +1110,7 @@ ${JSON.stringify(ledger)}
 4. 五条经营建议分别覆盖定位、产品、价格、时段、渠道。每条写清具体动作和一周内可记录的指标。
 5. evidenceSummaries 只处理这些 ID：${evidenceSummaryIds.join("、") || "无"}。删除网站导航、电话和版权文字；summary 40至90字，highlights 1至2条。
 6. 输出严格 JSON，不要 Markdown：
+7. 面向普通开店用户，使用“同类门店”“周边地点”等日常说法，不要写 POI、代理观察或数据流水线等术语。
 {
   "analysisSummary": "2至3句分析，说明证据如何导向结论",
   "recommendations": [{"area":"定位|产品|价格|时段|渠道","title":"...","detail":"...","verification":"...","evidenceIds":["..."]}],
@@ -1125,7 +1126,7 @@ export async function buildLiveReport({ address, mode, category }) {
   ]);
 
   if (broadPoisResult.status === "rejected") {
-    throw new Error(broadPoisResult.reason?.message || "周边竞品检索失败");
+    throw new Error(broadPoisResult.reason?.message || "周边同类门店检索失败");
   }
 
   const broadPois = broadPoisResult.value;
@@ -1171,7 +1172,7 @@ export async function buildLiveReport({ address, mode, category }) {
       sourceType: "map-api",
       capturedAt: nowLabel(),
       grade: "A",
-      excerpt: `地址“${address}”解析为“${center.label}”，坐标为 ${center.lng},${center.lat}。${center.precisionNote || ""}`,
+      excerpt: `地址“${address}”解析为“${center.label}”，坐标为 ${center.lng},${center.lat}。`,
       field: "地址与坐标",
       synthetic: false,
     },
@@ -1349,7 +1350,7 @@ export async function buildLiveReport({ address, mode, category }) {
     evidence,
     limitations: [
       ...analysis.limitations,
-      `本次共检索 ${broadPois.length} 个公开餐饮 POI、${competitors.length} 家直接竞品、${webEvidenceCount} 组公开网页线索。`,
+      `本次共找到 ${broadPois.length} 个公开餐饮地点、${competitors.length} 家同类门店、${webEvidenceCount} 组公开网页线索。`,
     ],
     diagnostics: {
       broadPoiCount: broadPois.length,

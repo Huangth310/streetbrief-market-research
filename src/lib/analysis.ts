@@ -146,7 +146,7 @@ export function buildDemoReport(input: AnalysisInput): Report {
         title: profile.opportunityTitle,
         summary: profile.opportunitySummary,
         rationale:
-          `800 米内有 3 家演示竞品，公开价格覆盖 ${profile.priceBand}；周边可以看到校区、办公和居住地点。`,
+          `800 米内有 3 家同类门店，公开价格覆盖 ${profile.priceBand}；周边可以看到校区、办公和居住地点。`,
         caution: profile.opportunityCaution,
         confidence:
           profile.opportunity === "insufficient"
@@ -163,9 +163,9 @@ export function buildDemoReport(input: AnalysisInput): Report {
         summary:
           "近端玩家通过稳定营业、基础产品与快取效率争夺日常复购；进入者需要明确自己的主场景。",
         rationale:
-          "直接竞品数量、公开营业时段与评价中的效率主题相互印证。",
+          "同类门店数量、公开营业时段与评价中的效率主题相互印证。",
         caution:
-          "竞品多不等于一定饱和；当前只能说明用户有选择，不能证明每一家都经营良好。",
+          "同类门店多不等于一定饱和；当前只能说明顾客有选择，不能证明每一家都经营良好。",
         confidence: "medium",
         evidenceIds: ["E01", "E02", "E04", "E21"],
       },
@@ -233,7 +233,7 @@ export function buildDemoReport(input: AnalysisInput): Report {
     limitations: [
       "当前报告使用内置演示样本，不代表真实商户、真实客流或真实销售。",
       "地图只展示近似 800 米核心圈与 3 公里上限，不代表精确步行等时圈。",
-      "缺少公开菜单的竞品只保留在总览，不进入价格对比。",
+      "缺少公开菜单的同类门店只保留在总览，不进入价格对比。",
       "公开评价主题是代理信号，无法替代真实访谈、到店观察或经营数据。",
     ],
     sample: true,
@@ -254,32 +254,53 @@ export async function analyzeMarket(
         ? configuredBase
         : "";
 
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), 75_000);
-    try {
-      const response = await fetch(`${apiBase}/api/analyze`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-        signal: controller.signal,
-      });
-      if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
-        throw new Error(
-          body.error ||
-            (response.status === 500
-              ? "实时分析服务没有正常启动"
-              : `分析服务返回 ${response.status}`),
-        );
+    async function requestReport() {
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 75_000);
+      try {
+        const response = await fetch(`${apiBase}/api/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(input),
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          const error = new Error(
+            body.error ||
+              (response.status >= 500
+                ? "调研服务刚刚启动，暂时没有响应"
+                : `调研服务返回 ${response.status}`),
+          ) as Error & { retryable?: boolean };
+          error.retryable = [500, 502, 503, 504].includes(response.status);
+          throw error;
+        }
+        return (await response.json()) as Report;
+      } catch (error) {
+        if (controller.signal.aborted) {
+          throw new Error("这次调研用时过长，请换一个更具体的地址后重试");
+        }
+        if (error instanceof TypeError) {
+          error.message = "网络连接暂时不稳定";
+          (error as Error & { retryable?: boolean }).retryable = true;
+        }
+        throw error;
+      } finally {
+        window.clearTimeout(timeoutId);
       }
-      return (await response.json()) as Report;
-    } catch (error) {
-      if (controller.signal.aborted) {
-        throw new Error("实时分析超过 75 秒，请换一个更具体的地址后重试");
+    }
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        return await requestReport();
+      } catch (error) {
+        const canRetry =
+          attempt === 0 &&
+          error instanceof Error &&
+          (error as Error & { retryable?: boolean }).retryable;
+        if (!canRetry) throw error;
+        await new Promise((resolve) => window.setTimeout(resolve, 1_200));
       }
-      throw error;
-    } finally {
-      window.clearTimeout(timeoutId);
     }
   }
 
