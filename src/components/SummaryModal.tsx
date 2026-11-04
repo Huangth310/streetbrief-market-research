@@ -66,7 +66,11 @@ export function SummaryModal({ report, onClose }: SummaryModalProps) {
           <header className="print-sheet-head">
             <div>
               <span>街研 / 开店调研</span>
-              <h2 id="summary-title">{report.profile.headline}</h2>
+              <h2 id="summary-title">
+                {report.input.mode === "discover"
+                  ? `建议先试：${report.profile.label}`
+                  : report.profile.headline}
+              </h2>
             </div>
             <div className="summary-verdict">
               <span>开店潜力</span>

@@ -91,6 +91,7 @@ export function ReportView({
   const [startedOpen, setStartedOpen] = useState(
     initialReport.input.mode === "discover",
   );
+  const isDiscoveryMode = report.input.mode === "discover";
   const activeRadius =
     distanceFilter === "core"
       ? 800
@@ -216,7 +217,7 @@ export function ReportView({
         <section className="report-cover">
           <div className="report-cover-copy">
             <div className="report-breadcrumb">
-              <span>周边市场调研</span>
+              <span>{isDiscoveryMode ? "经营方向推荐" : "周边市场调研"}</span>
               <ChevronRight size={13} />
               <span>{report.profile.label}</span>
               <span className="sample-pill">
@@ -231,7 +232,19 @@ export function ReportView({
                 {report.generatedAt} 更新
               </span>
             </div>
-            <h1>{report.profile.headline}</h1>
+            <h1>
+              {isDiscoveryMode ? (
+                <>
+                  建议先试
+                  <br />
+                  <span className="recommendation-highlight">
+                    {report.profile.label}
+                  </span>
+                </>
+              ) : (
+                report.profile.headline
+              )}
+            </h1>
             <p className="report-address">
               <MapPin size={16} />
               {report.input.address}
@@ -241,7 +254,11 @@ export function ReportView({
                 {report.center.precisionNote}
               </p>
             )}
-            <p className="report-summary">{report.profile.summary}</p>
+            <p className="report-summary">
+              {isDiscoveryMode
+                ? `综合附近门店数量、公开价格和周边人群后，这个方向更适合先做一轮小范围验证。${report.profile.opportunityTitle}。`
+                : report.profile.summary}
+            </p>
             <div className="report-cover-meta">
               <span>
                 <b>{report.competitors.length}</b>
