@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { classifyMarketOpportunity } from "../../server/report-builder.mjs";
+import {
+  classifyMarketOpportunity,
+  competitionBalanceScore,
+} from "../../server/report-builder.mjs";
 
 describe("classifyMarketOpportunity", () => {
   it("does not treat low competition alone as a supply gap", () => {
@@ -44,5 +47,19 @@ describe("classifyMarketOpportunity", () => {
         anchorCount: 2,
       }),
     ).toBe("mature_entry");
+  });
+});
+
+describe("competitionBalanceScore", () => {
+  it("does not reward either an empty market or a crowded market", () => {
+    expect(competitionBalanceScore(4)).toBeGreaterThan(
+      competitionBalanceScore(1),
+    );
+    expect(competitionBalanceScore(4)).toBeGreaterThan(
+      competitionBalanceScore(12),
+    );
+    expect(competitionBalanceScore(12)).toBeGreaterThan(
+      competitionBalanceScore(20),
+    );
   });
 });

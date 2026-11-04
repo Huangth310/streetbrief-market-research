@@ -100,6 +100,7 @@ export interface Recommendation {
 export interface CategoryRank {
   category: CategoryKey;
   label: string;
+  competitorCount: number;
   score: number;
   potentialScore: number;
   breakdown: {

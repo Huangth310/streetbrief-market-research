@@ -51,6 +51,30 @@ const opportunityLabels: Record<OpportunityType, string> = {
   insufficient: "资料不足",
 };
 
+const confidenceLabels = {
+  high: "较高",
+  medium: "中等",
+  low: "偏低",
+} as const;
+
+function rankingSignals(item: Report["ranking"][number]) {
+  const demand =
+    item.breakdown.demand >= 20
+      ? "人群匹配较强"
+      : item.breakdown.demand >= 12
+        ? "有人群基础"
+        : "人群信号偏弱";
+  const competition =
+    item.competitorCount === 0
+      ? "缺少竞争参照"
+      : item.competitorCount <= 2
+        ? "门店样本偏少"
+        : item.competitorCount <= 8
+          ? "竞争相对适中"
+          : "竞争较为密集";
+  return [demand, competition, `结论可信度${confidenceLabels[item.confidence]}`];
+}
+
 function EvidenceLinks({
   ids,
   onOpen,
@@ -345,6 +369,11 @@ export function ReportView({
                       </span>
                     </div>
                     <p>{item.note}</p>
+                    <div className="ranking-signals">
+                      {rankingSignals(item).map((signal) => (
+                        <span key={signal}>{signal}</span>
+                      ))}
+                    </div>
                     {item.category === report.category && (
                       <span className="ranking-recommendation">
                         当前建议先验证

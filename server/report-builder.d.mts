@@ -4,6 +4,8 @@ export function classifyMarketOpportunity(input: {
   anchorCount: number;
 }): "gap" | "mature_entry" | "insufficient";
 
+export function competitionBalanceScore(count: number): number;
+
 export function isRelevantWebResult(
   competitor: { name: string },
   poi: { address: string },

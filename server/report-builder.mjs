@@ -290,24 +290,74 @@ async function enrichCompetitors(candidates, category, evidence) {
   };
 }
 
-function calculateRanking(grouped, anchorCount) {
+const ANCHOR_FIT = {
+  coffee: { "教育设施": 0.75, "办公设施": 1.2, "居住设施": 0.85 },
+  tea: { "教育设施": 1.15, "办公设施": 0.75, "居住设施": 1.0 },
+  light: { "教育设施": 0.9, "办公设施": 1.2, "居住设施": 0.85 },
+  bakery: { "教育设施": 0.8, "办公设施": 0.55, "居住设施": 1.1 },
+  snack: { "教育设施": 0.55, "办公设施": 0.65, "居住设施": 1.15 },
+};
+
+export function competitionBalanceScore(count) {
+  if (count <= 0) return 3;
+  if (count === 1) return 7;
+  if (count === 2) return 12;
+  if (count <= 5) return 25;
+  if (count <= 8) return 21;
+  if (count <= 12) return 14;
+  return 6;
+}
+
+function anchorCounts(anchors) {
+  return anchors.reduce((counts, item) => {
+    const type = String(item.anchorType || "");
+    if (type) counts[type] = (counts[type] || 0) + 1;
+    return counts;
+  }, {});
+}
+
+function calculateRanking(grouped, anchors) {
+  const counts = anchorCounts(anchors);
+  const anchorCount = anchors.length;
   return categories.map((category) => {
     const items = grouped[category];
     const averageCompleteness = items.length
       ? items.reduce((total, item) => total + baseCompleteness(item), 0) /
         items.length
       : 0;
+    const weights = ANCHOR_FIT[category];
+    const demandSignal = Object.entries(counts).reduce(
+      (total, [type, count]) => total + Math.min(5, count) * (weights[type] || 0),
+      0,
+    );
+    const conceptDiversity = items.length
+      ? new Set(items.map((item) => item.type || item.typecode)).size /
+        items.length
+      : 0;
+    const priceCoverage = items.length
+      ? items.filter((item) => Number(item.cost) > 0).length / items.length
+      : 0;
+    const anchorDiversity = Object.keys(counts).filter(
+      (type) => (counts[type] || 0) > 0,
+    ).length;
     const breakdown = {
-      demand: clamp(Math.round(anchorCount * 3), 0, 25),
-      competition:
-        items.length >= 5 ? 20 : items.length >= 3 ? 16 : items.length ? 10 : 3,
-      scenario: clamp(Math.round(8 + averageCompleteness * 0.12), 0, 20),
+      demand: clamp(Math.round(demandSignal * 2.5), 0, 30),
+      competition: competitionBalanceScore(items.length),
+      scenario: clamp(
+        anchorDiversity * 5 + Math.round(averageCompleteness * 0.06),
+        0,
+        20,
+      ),
       differentiation: clamp(
-        Math.round(items.length ? averageCompleteness * 0.1 : 0),
+        Math.round(
+          items.length
+            ? 4 + (1 - conceptDiversity) * 8 + priceCoverage * 3
+            : 0,
+        ),
         0,
         15,
       ),
-      evidence: clamp(Math.round(averageCompleteness * 0.12), 0, 15),
+      evidence: clamp(Math.round(averageCompleteness * 0.1), 0, 10),
     };
     const score = clamp(
       Object.values(breakdown).reduce((total, value) => total + value, 0),
@@ -330,6 +380,7 @@ function calculateRanking(grouped, anchorCount) {
     return {
       category,
       label: CATEGORY_CONFIG[category].label,
+      competitorCount: items.length,
       score,
       potentialScore: potentialScoreFor(score, opportunity, {
         competitorCount: items.length,
@@ -353,12 +404,14 @@ function calculateRanking(grouped, anchorCount) {
       labelText,
       note:
         items.length === 0
-          ? "暂未找到同类门店，缺少可用于比较的竞争参照。"
-          : items.length > 12
-            ? `附近有 ${items.length} 家同类门店，竞争较密集，需要先找到清楚的差异。`
-            : items.length >= 3
-              ? `附近有 ${items.length} 家同类门店，资料覆盖度 ${Math.round(averageCompleteness)}%，具备初步比较条件。`
-              : `附近仅找到 ${items.length} 家同类门店，样本偏少，建议先补充现场观察。`,
+          ? "暂未找到同类门店，需求与竞争都缺少参照，不能仅凭“店少”判断值得进入。"
+          : items.length <= 2
+            ? `附近仅找到 ${items.length} 家同类门店，竞争参照偏少，需先核实是否存在真实需求。`
+            : items.length <= 8
+              ? `附近有 ${items.length} 家同类门店，供给处于可比较区间，仍需结合人群匹配和产品差异判断。`
+              : items.length <= 12
+                ? `附近有 ${items.length} 家同类门店，竞争压力偏高，建议寻找更明确的差异切口。`
+                : `附近有 ${items.length} 家同类门店，供给密集，不能把门店数量直接当作市场机会。`,
     };
   });
 }
@@ -1138,7 +1191,7 @@ export async function buildLiveReport({ address, mode, category }) {
   const grouped = Object.fromEntries(
     categories.map((key) => [key, broadPois.filter((poi) => matchesCategory(poi, key))]),
   );
-  const ranking = calculateRanking(grouped, anchors.length).sort(
+  const ranking = calculateRanking(grouped, anchors).sort(
     (a, b) =>
       b.score - a.score ||
       b.potentialScore - a.potentialScore ||

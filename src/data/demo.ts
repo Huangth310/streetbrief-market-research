@@ -189,6 +189,7 @@ export const categoryRanking: CategoryRank[] = [
   {
     category: "coffee",
     label: "现萃咖啡",
+    competitorCount: 8,
     score: 73,
     potentialScore: 4,
     breakdown: {
@@ -207,6 +208,7 @@ export const categoryRanking: CategoryRank[] = [
   {
     category: "light",
     label: "轻食快餐",
+    competitorCount: 8,
     score: 69,
     potentialScore: 4,
     breakdown: {
@@ -225,6 +227,7 @@ export const categoryRanking: CategoryRank[] = [
   {
     category: "bakery",
     label: "烘焙包点",
+    competitorCount: 8,
     score: 64,
     potentialScore: 3,
     breakdown: {
@@ -243,6 +246,7 @@ export const categoryRanking: CategoryRank[] = [
   {
     category: "tea",
     label: "鲜果茶饮",
+    competitorCount: 8,
     score: 58,
     potentialScore: 3,
     breakdown: {
@@ -261,6 +265,7 @@ export const categoryRanking: CategoryRank[] = [
   {
     category: "snack",
     label: "夜宵小吃",
+    competitorCount: 4,
     score: 49,
     potentialScore: 1,
     breakdown: {
